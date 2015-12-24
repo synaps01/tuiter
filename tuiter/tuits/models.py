@@ -31,3 +31,18 @@ class Tuit(models.Model):
             user=self.user.username,
             message=self.message[:10]
         )
+
+
+class UserLikesTuit(models.Model):
+    """Model for user likes tuit."""
+
+    user = models.ForeignKey(User, blank=False, null=False)
+    tuit = models.ForeignKey(Tuit, blank=False, null=False)
+    like_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """Return user likes tuit."""
+        return "{user} liked tuit {message}...".format(
+            user=self.user.username,
+            message=self.tuit.message[:10]
+        )
