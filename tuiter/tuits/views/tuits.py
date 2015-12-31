@@ -15,6 +15,8 @@ from django.shortcuts import render_to_response, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 
+from tuits.models import Tuit
+
 
 def landingPageView(request):
     """function for landing view."""
@@ -46,4 +48,16 @@ def tuiter_login(request):
 
 def timeline(request):
     """timeline function."""
-    return HttpResponse("you are on the timeline")
+    username = 'synaps01'
+    timeline_tuits = Tuit.objects.filter(
+            user__username=username,
+        )
+    ctxt = {
+        'timeline_tuits': timeline_tuits,
+        'username': username
+    }
+    return render_to_response(
+        'tuits/timeline.html',
+        context=ctxt,
+        context_instance=RequestContext(request)
+        )
