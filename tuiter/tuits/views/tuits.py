@@ -1,6 +1,7 @@
 """Teams Views module."""
 
 from django.views import generic
+from ..models import Tuit
 
 from django.views.generic import (
     TemplateView,
@@ -14,8 +15,6 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-
-from tuits.models import Tuit
 
 
 def landingPageView(request):
@@ -48,9 +47,12 @@ def tuiter_login(request):
 
 def timeline(request):
     """timeline function."""
-    username = 'synaps01'
+    username = None
+    if request.user.is_authenticated():
+        user = request.user
+        username = request.user.username
     timeline_tuits = Tuit.objects.filter(
-            user__username=username,
+            user=user,
         )
     ctxt = {
         'timeline_tuits': timeline_tuits,
@@ -61,3 +63,17 @@ def timeline(request):
         context=ctxt,
         context_instance=RequestContext(request)
         )
+
+
+def newtuit(request):
+    """newtuit funciton."""
+    tuit_text = ''
+    if request.POST:
+        tuit_text = request.POST['tuit_text']
+    if tuit_text and len(tuit_text) > 0 and request.user.is_authenticated():
+        user = request.user
+        newT = Tuit()
+        newT.user = user
+        newT.message = tuit_text
+        newT.save()
+    return HttpResponseRedirect(reverse('tuiter:timeline'))
