@@ -1,6 +1,7 @@
 """Teams Views module."""
 
 from django.views import generic
+from ..models import Tuit
 
 from django.views.generic import (
     TemplateView,
@@ -46,4 +47,33 @@ def tuiter_login(request):
 
 def timeline(request):
     """timeline function."""
-    return HttpResponse("you are on the timeline")
+    username = None
+    if request.user.is_authenticated():
+        user = request.user
+        username = request.user.username
+    timeline_tuits = Tuit.objects.filter(
+            user=user,
+        )
+    ctxt = {
+        'timeline_tuits': timeline_tuits,
+        'username': username
+    }
+    return render_to_response(
+        'tuits/timeline.html',
+        context=ctxt,
+        context_instance=RequestContext(request)
+        )
+
+
+def newtuit(request):
+    """newtuit funciton."""
+    tuit_text = ''
+    if request.POST:
+        tuit_text = request.POST['tuit_text']
+    if tuit_text and len(tuit_text) > 0 and request.user.is_authenticated():
+        user = request.user
+        newT = Tuit()
+        newT.user = user
+        newT.message = tuit_text
+        newT.save()
+    return HttpResponseRedirect(reverse('tuiter:timeline'))
