@@ -136,4 +136,28 @@ def my_profile(request):
 
 def edit_profile(request):
     """Edit profile function."""
-    return HttpResponse("editing profile ...")
+    if request.user.is_authenticated():
+        user = request.user
+        user_settings = UserSettings.objects.filter(
+                user=user
+            )[0]
+        ctxt = {
+            'user': user,
+            'user_settings': user_settings
+        }
+        return render_to_response(
+            'tuits/edit_profile.html',
+            context=ctxt,
+            context_instance=RequestContext(request)
+            )
+    else:
+        return render_to_response(
+            'account/landing.html',
+            context_instance=RequestContext(request)
+            )
+
+
+def register(request):
+    """Register function."""
+    return HttpResponse("Registering ...")
+    
