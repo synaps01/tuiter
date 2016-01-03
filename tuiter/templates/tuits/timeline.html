@@ -1,38 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-
-    <meta charset="UTF-8" />
-    <title>Tuiter</title>
-    <meta name="description" content="{% block meta_description %}{% endblock %}"/>
-    <!-- Stylesheets -->
-    <!-- Scripts -->
-</head>
-<body>
+{% extends "tuits/tuiter_base.html" %}
+{% block title %}Timeline{% endblock %}
+{% block body %}
     <h3> Timeline de {{ username }} </h3>
-    <aside>
-        <form action="{% url 'tuiter:newtuit' %}" method="POST">
-            {% csrf_token %}
-            <ul style="list-style-type:none">
-                <li><textarea name="tuit_text" rows="3" cols="50"></textarea></li>
-                <li><input type="submit" value="Tuit"></li>
-            </ul>
-        </form>
-    </aside>
-    <article>
-        <ul style="list-style-type:none">
-            {% for tuit in timeline_tuits %}
-                <li>
-                    <ul style="list-style-type:none">
-                        <li>{{ tuit.user.username }} {{ tuit.tuit_date | date:"g:i  d M, Y" }} </li>
-                        <li>{{ tuit.message }}</li>
-                        <li>&nbsp;</li>
-                    </ul>
-                </li>
-            {% empty %}
-                <p>No hay equipos</p>
-            {% endfor %}
-        </ul>
-    </article>
-</body>
-</html>
+    {% include "tuits/new_tuit.html" %}
+    {% include "tuits/tuits_list.html" %}
+{% endblock %}

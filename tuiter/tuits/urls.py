@@ -7,6 +7,9 @@ from .views import tuits
 urlpatterns = [
     url(r'^$', tuits.landingPageView, name='landing'),
     url(r'login$', tuits.tuiter_login, name='login'),
+    url(r'logout$', tuits.tuiter_logout, name='logout'),
     url(r'timeline$', tuits.timeline, name='timeline'),
     url(r'newtuit$', tuits.newtuit, name='newtuit'),
+    url(r'my_profile$', tuits.my_profile, name='my_profile'),
+    url(r'edit_profile$', tuits.edit_profile, name='edit_profile'),
 ]

@@ -1,0 +1,15 @@
+<article>
+    <ul style="list-style-type:none">
+        {% for tuit in timeline_tuits %}
+            <li>
+                <ul style="list-style-type:none">
+                    <li>{{ tuit.user.username }} {{ tuit.tuit_date | date:"g:i  d M, Y" }} </li>
+                    <li>{{ tuit.message }}</li>
+                    <li>&nbsp;</li>
+                </ul>
+            </li>
+        {% empty %}
+            <p>No hay tuits</p>
+        {% endfor %}
+    </ul>
+</article>

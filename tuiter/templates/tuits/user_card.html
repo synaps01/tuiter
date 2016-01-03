@@ -1,0 +1,19 @@
+<article>
+    <h3> {{ user.username }} profile</h3>
+    <figure>
+        <img src="{{ user_settings.cover_picture.url }}" alt="cover_picture"> 
+    </figure>
+    <figure>
+        <img src="{{ user_settings.profile_picture.url }}" alt="profile_picture">
+        <ul style="list-style-type:none">
+            <li>Username: {{ user.username }}</li>
+            <li>First name: {{user.first_name}} </li>
+            <li>Last name: {{user.last_name}} </li>
+            <li>Tuiter user since: {{ user.date_joined }}</li>
+            <li>&nbsp;</li>
+            <li>Tuits {{ total_tuits }}</li>
+            <li>Following {{ total_following }}</li>
+            <li>Followers {{ total_followers }}</li>
+        </ul>
+    </figure>
+</article>
