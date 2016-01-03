@@ -5,15 +5,15 @@
     </figure>
     <figure>
         <img src="{{ user_settings.profile_picture.url }}" alt="profile_picture">
-        <ul style="list-style-type:none">
-            <li>Username: {{ user.username }}</li>
-            <li>First name: {{user.first_name}} </li>
-            <li>Last name: {{user.last_name}} </li>
-            <li>Tuiter user since: {{ user.date_joined }}</li>
-            <li>&nbsp;</li>
-            <li>Tuits {{ total_tuits }}</li>
-            <li>Following {{ total_following }}</li>
-            <li>Followers {{ total_followers }}</li>
-        </ul>
     </figure>
+    <ul style="list-style-type:none">
+        <li>Username: {{ user.username }}</li>
+        <li>First name: {{user.first_name}} </li>
+        <li>Last name: {{user.last_name}} </li>
+        <li>Tuiter user since: {{ user.date_joined }}</li>
+        <li>&nbsp;</li>
+        <li><a href="#">Tuits {{ total_tuits }}</a></li>
+        <li><a href="#">Following {{ total_following }}</a></li>
+        <li><a href="#">Followers {{ total_followers }}</a></li>
+    </ul>
 </article>
