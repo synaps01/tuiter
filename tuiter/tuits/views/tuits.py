@@ -3,6 +3,7 @@
 from django.views import generic
 from ..models import Tuit
 from useraccounts.models import UserSettings, UserFollowsUser
+from django.contrib.auth.models import User
 
 from django.views.generic import (
     TemplateView,
@@ -159,5 +160,34 @@ def edit_profile(request):
 
 def register(request):
     """Register function."""
-    return HttpResponse("Registering ...")
-    
+    user = username = email = password = None
+    if request.POST:
+        username = request.POST['username']
+        password = request.POST['password']
+        email = request.POST['email']
+        users = User.objects.filter(
+                username=username
+            )
+        if users:
+            dictionary = {'message': "Username already exists."}
+            return render_to_response(
+                'account/landing.html',
+                context_instance=RequestContext(request)
+            )
+        else:
+            user = User()
+            user.username = username
+            user.email = email
+            user.set_password(password)
+            user.save()
+            user_settings = UserSettings()
+            user_settings.user = user
+            user_settings.save()
+            user_log_in = authenticate(
+                username=username,
+                password=password
+                )
+            if user_log_in is not None:
+                if user_log_in.is_active:
+                    login(request, user_log_in)
+                    return HttpResponseRedirect(reverse('tuiter:timeline'))
