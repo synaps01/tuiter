@@ -1,10 +1,10 @@
 <article>
     <h3> {{ user.username }} profile</h3>
     <figure>
-        <img src="{{ user_settings.cover_picture.url }}" alt="cover_picture"> 
+        <img src="{% if user_settings.cover_picture %} {{ user_settings.cover_picture.url }} {% endif %}" alt="cover_picture"> 
     </figure>
     <figure>
-        <img src="{{ user_settings.profile_picture.url }}" alt="profile_picture">
+        <img src="{% if user_settings.profile_picture %}{{ user_settings.profile_picture.url }} {% endif %}" alt="profile_picture">
     </figure>
     <ul style="list-style-type:none">
         <li>Username: {{ user.username }}</li>
