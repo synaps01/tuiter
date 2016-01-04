@@ -191,3 +191,98 @@ def register(request):
                 if user_log_in.is_active:
                     login(request, user_log_in)
                     return HttpResponseRedirect(reverse('tuiter:timeline'))
+
+
+def editBasicInfo(request):
+    """Edit basic info function."""
+    user = new_first_name = new_last_name = new_email = None
+    if request.POST:
+        new_first_name = request.POST['first_name']
+        new_last_name = request.POST['last_name']
+        new_email = request.POST['email']
+        if request.user.is_authenticated():
+            user = request.user
+            user.first_name = new_first_name
+            user.last_name = new_last_name
+            user.email = new_email
+            user.save()
+            ctxt = {
+                'userUpdated': 'yes'
+            }
+            return render_to_response(
+                    'tuits/edit_profile.html',
+                    context=ctxt,
+                    context_instance=RequestContext(request)
+                )
+        else:
+            return render_to_response(
+                'account/landing.html',
+                context_instance=RequestContext(request)
+                )
+    else:
+        return render_to_response(
+                'tuits/edit_profile.html',
+                context_instance=RequestContext(request)
+            )
+
+
+def changePassword(request):
+    """Change password function."""
+    user = username = old_password = new_password = confirm_password = None
+    if request.POST:
+        old_password = request.POST['old_password']
+        new_password = request.POST['new_password']
+        confirm_password = request.POST['confirm_password']
+        if new_password != confirm_password:
+            pass_message = 'The new password doesn\'t match'
+            ctxt = {
+                'pass_message': pass_message
+            }
+            return render_to_response(
+                    'tuits/edit_profile.html',
+                    context=ctxt,
+                    context_instance=RequestContext(request)
+                )
+        elif request.user.is_authenticated():
+            user = request.user
+            username = request.user.username
+            user_auth = authenticate(username=username, password=old_password)
+            if user_auth is None:
+                pass_message = 'The old password is incorrect'
+                ctxt = {
+                    'pass_message': pass_message
+                }
+                return render_to_response(
+                        'tuits/edit_profile.html',
+                        context=ctxt,
+                        context_instance=RequestContext(request)
+                    )
+            else:
+                user.set_password(new_password)
+                user.save()
+                new_user_session = authenticate(
+                        username=username,
+                        password=new_password
+                    )
+                if new_user_session is not None:
+                    if new_user_session.is_active:
+                        login(request, new_user_session)
+                pass_message = 'Password updated successfully!'
+                ctxt = {
+                    'pass_message': pass_message
+                }
+                return render_to_response(
+                        'tuits/edit_profile.html',
+                        context=ctxt,
+                        context_instance=RequestContext(request)
+                    )
+        else:
+            return render_to_response(
+                    'account/landing.html',
+                    context_instance=RequestContext(request)
+            )
+    else:
+        return render_to_response(
+                'tuits/edit_profile.html',
+                context_instance=RequestContext(request)
+            )

@@ -13,4 +13,6 @@ urlpatterns = [
     url(r'newtuit$', tuits.newtuit, name='newtuit'),
     url(r'my_profile$', tuits.my_profile, name='my_profile'),
     url(r'edit_profile$', tuits.edit_profile, name='edit_profile'),
+    url(r'edit_basic_info$', tuits.editBasicInfo, name='editBasicInfo'),
+    url(r'change_password$', tuits.changePassword, name='changePassword'),
 ]
