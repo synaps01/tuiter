@@ -1,0 +1,18 @@
+{% extends "tuits/tuiter_base.html" %}
+{% block title %}{{ user.username }} Profile{% endblock %}
+{% block body %}
+    {% include "tuits/user_card.html" %}
+    <article>  
+        {% if following_user %}
+        <form action="{% url 'tuiter:userUnfollow' user %}" method="POST">
+            {% csrf_token %}
+                <input type="submit" value="Unfollow">
+        </form>
+        {% else %}
+        <form action="{% url 'tuiter:userFollow' user %}" method="POST">
+            {% csrf_token %}
+                <input type="submit" value="Follow">
+        </form>
+        {% endif %}
+    </article>
+{% endblock %}
