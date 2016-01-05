@@ -63,9 +63,16 @@ def timeline(request):
     if request.user.is_authenticated():
         user = request.user
         username = request.user.username
+        followed_users = UserFollowsUser.objects.filter(
+                user=user
+            )
+        followed_users_ids = []
+        for u in followed_users:
+            followed_users_ids.append(u.followed_user.id)
+        followed_users_ids.append(user.id)
         timeline_tuits = Tuit.objects.filter(
-            user=user,
-        )
+            user__in=followed_users_ids,
+        ).order_by('-tuit_date')
         ctxt = {
             'timeline_tuits': timeline_tuits,
             'username': username
