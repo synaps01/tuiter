@@ -314,3 +314,113 @@ def searchUser(request):
             context=ctxt,
             context_instance=RequestContext(request)
         )
+
+
+def userProfile(request, tuiter_username):
+    """User profile function."""
+    user = following_user = None
+    user = request.user
+    tuiter_users = tuiter_user = None
+    tuiter_users = User.objects.filter(
+        username=tuiter_username
+        )
+    if tuiter_users:
+        tuiter_user = tuiter_users[0]
+        if user:
+            ufus = UserFollowsUser.objects.filter(
+                    user=user,
+                    followed_user=tuiter_user
+                )
+            if ufus:
+                following_user = 'yes'
+        user_settings = UserSettings.objects.filter(
+                user=tuiter_user
+            )[0]
+        timeline_tuits = Tuit.objects.filter(
+                user=tuiter_user
+            )
+        total_tuits = len(Tuit.objects.filter(
+                user=tuiter_user
+            ))
+        total_following = len(UserFollowsUser.objects.filter(
+                user=tuiter_user
+            ))
+        total_followers = len(UserFollowsUser.objects.filter(
+                followed_user=tuiter_user
+            ))
+        ctxt = {
+            'user': tuiter_user,
+            'following_user': following_user,
+            'source_user': user,
+            'user_settings': user_settings,
+            'total_tuits': total_tuits,
+            'total_following': total_following,
+            'total_followers': total_followers
+        }
+        return render_to_response(
+                'tuits/user_profile.html',
+                context=ctxt,
+                context_instance=RequestContext(request)
+            )
+
+
+def userFollow(request, tuiter_user):
+    """User follow function."""
+    if request.POST and request.user.is_authenticated:
+        user = request.user
+        ustf = User.objects.filter(
+                username=tuiter_user
+            )
+        if ustf:
+            user_to_follow = ustf[0]
+            user_follows_user = None
+            user_follows_user = UserFollowsUser.objects.filter(
+                    user=user,
+                    followed_user=user_to_follow
+                )
+            if not user_follows_user:
+                user_follows_user = UserFollowsUser()
+                user_follows_user.user = user
+                user_follows_user.followed_user = user_to_follow
+                user_follows_user.save()
+                return HttpResponseRedirect(
+                    reverse(
+                        'tuiter:userProfile',
+                        args=(user_to_follow.username,)
+                        )
+                    )
+    else:
+        return render_to_response(
+            'account/landing.html',
+            context_instance=RequestContext(request)
+        )
+
+
+def userUnfollow(request, tuiter_user):
+    """User unfollow function."""
+    if request.POST and request.user.is_authenticated:
+        user = request.user
+        ustf = User.objects.filter(
+                username=tuiter_user
+            )
+        if ustf:
+            user_to_unfollow = ustf[0]
+            user_follows_user = None
+            user_follows_user = UserFollowsUser.objects.filter(
+                    user=user,
+                    followed_user=user_to_unfollow
+                )
+            if user_follows_user:
+                ufu = user_follows_user[0]
+                ufu.delete()
+                return HttpResponseRedirect(
+                    reverse(
+                        'tuiter:userProfile',
+                        args=(user_to_unfollow.username,)
+                        )
+                    )
+    else:
+        return render_to_response(
+            'account/landing.html',
+            context_instance=RequestContext(request)
+        )

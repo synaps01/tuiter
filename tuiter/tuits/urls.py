@@ -16,4 +16,19 @@ urlpatterns = [
     url(r'edit_profile$', tuits.edit_profile, name='edit_profile'),
     url(r'edit_basic_info$', tuits.editBasicInfo, name='editBasicInfo'),
     url(r'change_password$', tuits.changePassword, name='changePassword'),
+    url(
+        r'user_profile/(?P<tuiter_username>[\w-]+)',
+        tuits.userProfile,
+        name='userProfile'
+        ),
+    url(
+        r'user_follow/(?P<tuiter_user>[\w-]+)',
+        tuits.userFollow,
+        name='userFollow'
+        ),
+    url(
+        r'user_unfollow/(?P<tuiter_user>[\w-]+)',
+        tuits.userUnfollow,
+        name='userUnfollow'
+        ),
 ]
