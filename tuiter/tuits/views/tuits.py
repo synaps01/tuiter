@@ -123,13 +123,17 @@ def my_profile(request):
         total_followers = len(UserFollowsUser.objects.filter(
                 followed_user=user
             ))
+        timeline_tuits = Tuit.objects.filter(
+                user=user
+            )
         ctxt = {
             'timeline_tuits': timeline_tuits,
             'user': user,
             'user_settings': user_settings,
             'total_tuits': total_tuits,
             'total_following': total_following,
-            'total_followers': total_followers
+            'total_followers': total_followers,
+            'timeline_tuits': timeline_tuits
         }
         return render_to_response(
             'tuits/my_profile.html',
@@ -348,6 +352,9 @@ def userProfile(request, tuiter_username):
         total_followers = len(UserFollowsUser.objects.filter(
                 followed_user=tuiter_user
             ))
+        timeline_tuits = Tuit.objects.filter(
+                user=tuiter_user
+            )
         ctxt = {
             'user': tuiter_user,
             'following_user': following_user,
@@ -355,7 +362,8 @@ def userProfile(request, tuiter_username):
             'user_settings': user_settings,
             'total_tuits': total_tuits,
             'total_following': total_following,
-            'total_followers': total_followers
+            'total_followers': total_followers,
+            'timeline_tuits': timeline_tuits
         }
         return render_to_response(
                 'tuits/user_profile.html',
