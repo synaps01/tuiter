@@ -4,6 +4,7 @@ from django.views import generic
 from ..models import Tuit
 from useraccounts.models import UserSettings, UserFollowsUser
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 from django.views.generic import (
     TemplateView,
@@ -293,3 +294,23 @@ def changePassword(request):
                 'tuits/edit_profile.html',
                 context_instance=RequestContext(request)
             )
+
+
+def searchUser(request):
+    """search user function."""
+    ctxt = None
+    if request.POST:
+        search_text = request.POST['search_text']
+        users = User.objects.filter(
+                Q(username__icontains=search_text) |
+                Q(first_name__icontains=search_text) |
+                Q(last_name__icontains=search_text)
+            )
+        ctxt = {
+                'users': users
+            }
+    return render_to_response(
+            'tuits/search_result.html',
+            context=ctxt,
+            context_instance=RequestContext(request)
+        )

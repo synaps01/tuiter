@@ -1,0 +1,7 @@
+{% extends "tuits/tuiter_base.html" %}
+{% block title %}Tuit Search{% endblock %}
+{% block body %}
+    <h3> Tuiter users like: </h3>
+    {% include "tuits/user_search.html" %}
+    {% include "tuits/users_list.html" %}
+{% endblock %}

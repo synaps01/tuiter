@@ -1,0 +1,9 @@
+<aside>
+    <form action="{% url 'tuiter:searchUser' %}" method="POST">
+        {% csrf_token %}
+        <ul style="list-style-type:none">
+            <li>Find someone: <input type="text" name="search_text" placeholder="username"/></li>
+            <li><input type="submit" value="Search User"></li>
+        </ul>
+    </form>
+</aside>
