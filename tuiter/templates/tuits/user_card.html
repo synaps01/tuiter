@@ -12,8 +12,8 @@
         <li>Last name: {{user.last_name}} </li>
         <li>Tuiter user since: {{ user.date_joined }}</li>
         <li>&nbsp;</li>
-        <li><a href="#">Tuits {{ total_tuits }}</a></li>
-        <li><a href="#">Following {{ total_following }}</a></li>
-        <li><a href="#">Followers {{ total_followers }}</a></li>
+        <li><a href="{% url 'tuiter:userProfile' user.username %}">Tuits {{ total_tuits }}</a></li>
+        <li><a href="{% url 'tuiter:userProfileFollowing' user.username %}">Following {{ total_following }}</a></li>
+        <li><a href="{% url 'tuiter:userProfileFollowers' user.username %}">Followers {{ total_followers }}</a></li>
     </ul>
 </article>
