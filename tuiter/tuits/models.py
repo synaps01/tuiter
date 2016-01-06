@@ -25,6 +25,14 @@ class Tuit(models.Model):
     total_likes = models.IntegerField(default=0)
     total_retuits = models.IntegerField(default=0)
 
+    is_retuit = models.BooleanField(default=False)
+    original_tuit = models.ForeignKey(
+        "Tuit",
+        related_name='retuited_tuit',
+        blank=True,
+        null=True
+    )
+
     def __str__(self):
         """Return tuit."""
         return "{user} tuited {message}...".format(
