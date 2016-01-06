@@ -31,4 +31,14 @@ urlpatterns = [
         tuits.userUnfollow,
         name='userUnfollow'
         ),
+    url(
+        r'user_following/(?P<tuiter_username>[\w-]+)',
+        tuits.userProfileFollowing,
+        name='userProfileFollowing'
+        ),
+    url(
+        r'user_followers/(?P<tuiter_username>[\w-]+)',
+        tuits.userProfileFollowers,
+        name='userProfileFollowers'
+        ),
 ]

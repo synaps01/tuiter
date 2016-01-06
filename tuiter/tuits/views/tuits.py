@@ -365,11 +365,18 @@ def userProfile(request, tuiter_username):
             'total_followers': total_followers,
             'timeline_tuits': timeline_tuits
         }
-        return render_to_response(
-                'tuits/user_profile.html',
-                context=ctxt,
-                context_instance=RequestContext(request)
-            )
+        if user == tuiter_user:
+            return render_to_response(
+                    'tuits/my_profile.html',
+                    context=ctxt,
+                    context_instance=RequestContext(request)
+                )
+        else:
+            return render_to_response(
+                    'tuits/user_profile.html',
+                    context=ctxt,
+                    context_instance=RequestContext(request)
+                )
 
 
 def userFollow(request, tuiter_user):
@@ -432,3 +439,119 @@ def userUnfollow(request, tuiter_user):
             'account/landing.html',
             context_instance=RequestContext(request)
         )
+
+
+def userProfileFollowing(request, tuiter_username):
+    """Following users function."""
+    user = following_user = None
+    user = request.user
+    tuiter_users = tuiter_user = None
+    tuiter_users = User.objects.filter(
+        username=tuiter_username
+        )
+    if tuiter_users:
+        tuiter_user = tuiter_users[0]
+        if user:
+            ufus = UserFollowsUser.objects.filter(
+                    user=user,
+                    followed_user=tuiter_user
+                )
+            if ufus:
+                following_user = 'yes'
+        user_settings = UserSettings.objects.filter(
+                user=tuiter_user
+            )[0]
+        timeline_tuits = Tuit.objects.filter(
+                user=tuiter_user
+            )
+        total_tuits = len(Tuit.objects.filter(
+                user=tuiter_user
+            ))
+        total_following = len(UserFollowsUser.objects.filter(
+                user=tuiter_user
+            ))
+        total_followers = len(UserFollowsUser.objects.filter(
+                followed_user=tuiter_user
+            ))
+        user_following_users = UserFollowsUser.objects.filter(
+                user=tuiter_user
+            )
+        following_users_ids = []
+        for u in user_following_users:
+            following_users_ids.append(u.followed_user.id)
+        following_users = User.objects.filter(
+            id__in=following_users_ids,
+        )
+        ctxt = {
+            'user': tuiter_user,
+            'following_user': following_user,
+            'source_user': user,
+            'user_settings': user_settings,
+            'total_tuits': total_tuits,
+            'total_following': total_following,
+            'total_followers': total_followers,
+            'users': following_users
+        }
+        return render_to_response(
+                'tuits/user_follows.html',
+                context=ctxt,
+                context_instance=RequestContext(request)
+            )
+
+
+def userProfileFollowers(request, tuiter_username):
+    """Follower users function."""
+    user = following_user = None
+    user = request.user
+    tuiter_users = tuiter_user = None
+    tuiter_users = User.objects.filter(
+        username=tuiter_username
+        )
+    if tuiter_users:
+        tuiter_user = tuiter_users[0]
+        if user:
+            ufus = UserFollowsUser.objects.filter(
+                    user=user,
+                    followed_user=tuiter_user
+                )
+            if ufus:
+                following_user = 'yes'
+        user_settings = UserSettings.objects.filter(
+                user=tuiter_user
+            )[0]
+        timeline_tuits = Tuit.objects.filter(
+                user=tuiter_user
+            )
+        total_tuits = len(Tuit.objects.filter(
+                user=tuiter_user
+            ))
+        total_following = len(UserFollowsUser.objects.filter(
+                user=tuiter_user
+            ))
+        total_followers = len(UserFollowsUser.objects.filter(
+                followed_user=tuiter_user
+            ))
+        user_follower_users = UserFollowsUser.objects.filter(
+                followed_user=tuiter_user
+            )
+        follower_users_ids = []
+        for u in user_follower_users:
+            follower_users_ids.append(u.user.id)
+        follower_users = User.objects.filter(
+            id__in=follower_users_ids,
+        )
+        ctxt = {
+            'user': tuiter_user,
+            'following_user': following_user,
+            'source_user': user,
+            'user_settings': user_settings,
+            'total_tuits': total_tuits,
+            'total_following': total_following,
+            'total_followers': total_followers,
+            'users': follower_users
+        }
+        return render_to_response(
+                'tuits/user_followers.html',
+                context=ctxt,
+                context_instance=RequestContext(request)
+            )

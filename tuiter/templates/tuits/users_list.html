@@ -1,11 +1,11 @@
 <article>
     <ul style="list-style-type:none">
-        {% for user in users %}
+        {% for u in users %}
             <li>
                 <ul style="list-style-type:none">
-                    <li><a href="{% url 'tuiter:userProfile' user.username %}">{{ user.username }}</a></li>
-                    <li>{{ user.first_name }} {{ user.last_name }}</li>
-                    <li>tuiter user since {{ user.date_joined | date:"g:i  d M, Y" }} </li>
+                    <li><a href="{% url 'tuiter:userProfile' u.username %}">@{{ u.username }}</a></li>
+                    <li>{{ u.first_name }} {{ u.last_name }}</li>
+                    <li>tuiter user since {{ u.date_joined | date:"g:i  d M, Y" }} </li>
                     <li>&nbsp;</li>
                 </ul>
             </li>
