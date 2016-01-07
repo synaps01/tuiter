@@ -1,13 +1,12 @@
 <article>
     <h3> {{ user.username }} profile</h3>
     <figure>
-        <img src="{% if user_settings.cover_picture %} {{ user_settings.cover_picture.url }} {% endif %}" alt="cover_picture"> 
+        <img src="{% if user_settings.cover_picture %} {{ user_settings.cover_picture.url }} {% endif %}" alt="cover_picture" height="160" width="440"> 
     </figure>
     <figure>
-        <img src="{% if user_settings.profile_picture %}{{ user_settings.profile_picture.url }} {% endif %}" alt="profile_picture">
+        <img src="{% if user_settings.profile_picture %}{{ user_settings.profile_picture.url }} {% endif %}" alt="profile_picture" height="150" width="150">
     </figure>
     <ul style="list-style-type:none">
-        <li>{% if user_settings.profile_picture %}{{ user_settings.profile_picture.url }} {% endif %}</li>
         <li>Username: {{ user.username }}</li>
         <li>First name: {{user.first_name}} </li>
         <li>Last name: {{user.last_name}} </li>
