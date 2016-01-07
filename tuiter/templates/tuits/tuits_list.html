@@ -1,10 +1,61 @@
 <article>
     <ul style="list-style-type:none">
-        {% for tuit in timeline_tuits %}
+        {% for t in timeline_tuits %}
             <li>
                 <ul style="list-style-type:none">
-                    <li><a href="{% url 'tuiter:userProfile' tuit.user.username %}">@{{ tuit.user.username }}</a> {{ tuit.tuit_date | date:"g:i  d M, Y" }} </li>
-                    <li>{{ tuit.message }}</li>
+                    <li><a href="{% url 'tuiter:userProfile' t.tuit_object.user.username %}">@{{ t.tuit_object.user.username }}</a> {{ t.tuit_object.tuit_date | date:"g:i  d M, Y" }} </li>
+                    <li>{{ t.tuit_object.message }}</li>
+                    <table>
+                        <tr>
+                            <td>likes {{ t.tuit_object.total_likes }}</td>
+                            <td>retuits {{ t.retuits }}</td>
+                        </tr>
+                    </table>
+                    <li>
+                    <table>
+                        <tr>
+                            <td>
+                                {% if t.liked == True %}
+                                <form action="{% url 'tuiter:removeTuitLike' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="tuit_id" value="{{ t.tuit_object.id }}">
+                                    <input type="hidden" name="redirect_url" value="{{ redirect_url }}">
+                                    <input type="hidden" name="use_parameters" value="{{ use_parameters }}">
+                                    <input type="hidden" name="parameter_value" value="{{ parameter_value }}">
+                                    <input id="{{ t.tuit_object.id }}" type="submit" value="Dislike">
+                                </form>
+                                {% else %}
+                                <form action="{% url 'tuiter:likeTuit' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="tuit_id" value="{{ t.tuit_object.id }}">
+                                    <input type="hidden" name="redirect_url" value="{{ redirect_url }}">
+                                    <input type="hidden" name="use_parameters" value="{{ use_parameters }}">
+                                    <input type="hidden" name="parameter_value" value="{{ parameter_value }}">
+                                    <input id="{{ t.tuit_object.id }}" type="submit" value="Like">
+                                </form>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form action="#" method="POST">
+                                    {% csrf_token %}
+                                    <input type="submit" value="Retuit">
+                                </form>
+                            </td>
+                            {% if logged_user.username == t.tuit_object.user.username %}
+                            <td>
+                                <form action="{% url 'tuiter:deleteTuit' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="tuit_id" value="{{ t.tuit_object.id }}">
+                                    <input type="hidden" name="redirect_url" value="{{ redirect_url }}">
+                                    <input type="hidden" name="use_parameters" value="{{ use_parameters }}">
+                                    <input type="hidden" name="parameter_value" value="{{ parameter_value }}">
+                                    <input type="submit" value="Delete">
+                                </form>
+                            </td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                    </li>
                     <li>&nbsp;</li>
                 </ul>
             </li>

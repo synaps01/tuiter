@@ -1,7 +1,7 @@
 """Teams Views module."""
 
 from django.views import generic
-from ..models import Tuit
+from ..models import Tuit, UserLikesTuit
 from useraccounts.models import UserSettings, UserFollowsUser
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -18,6 +18,8 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
+import json
+import ast
 
 
 def landingPageView(request):
@@ -74,9 +76,26 @@ def timeline(request):
         timeline_tuits = Tuit.objects.filter(
             user__in=followed_users_ids,
         ).order_by('-tuit_date')
+        user_likes_tuits = UserLikesTuit.objects.filter(user=user)
+        tuits = []
+        for t in timeline_tuits:
+            tuit_data = {
+                'tuit_object': t,
+                'liked': False,
+                'retuits': 0
+            }
+            for ult in user_likes_tuits:
+                if t == ult.tuit:
+                    tuit_data['liked'] = True
+                    break
+            tuits.append(tuit_data)
+        redirect_url = 'tuiter:timeline'
         ctxt = {
-            'timeline_tuits': timeline_tuits,
-            'username': username
+            'timeline_tuits': tuits,
+            'username': username,
+            'logged_user': user,
+            'redirect_url': redirect_url,
+            'use_parameters': False
         }
         return render_to_response(
                 'tuits/timeline.html',
@@ -113,7 +132,7 @@ def my_profile(request):
             )[0]
         timeline_tuits = Tuit.objects.filter(
                 user=user,
-            )
+            ).order_by('-tuit_date')
         total_tuits = len(Tuit.objects.filter(
                 user=user
             ))
@@ -123,17 +142,31 @@ def my_profile(request):
         total_followers = len(UserFollowsUser.objects.filter(
                 followed_user=user
             ))
-        timeline_tuits = Tuit.objects.filter(
-                user=user
-            )
+        user_likes_tuits = UserLikesTuit.objects.filter(user=user)
+        tuits = []
+        for t in timeline_tuits:
+            tuit_data = {
+                'tuit_object': t,
+                'liked': False,
+                'retuits': 0
+            }
+            for ult in user_likes_tuits:
+                if t == ult.tuit:
+                    tuit_data['liked'] = True
+                    break
+            tuits.append(tuit_data)
+        redirect_url = 'tuiter:userProfile'
         ctxt = {
-            'timeline_tuits': timeline_tuits,
+            'timeline_tuits': tuits,
             'user': user,
             'user_settings': user_settings,
             'total_tuits': total_tuits,
             'total_following': total_following,
             'total_followers': total_followers,
-            'timeline_tuits': timeline_tuits
+            'logged_user': user,
+            'redirect_url': redirect_url,
+            'use_parameters': True,
+            'parameter_value': user.username
         }
         return render_to_response(
             'tuits/my_profile.html',
@@ -342,7 +375,7 @@ def userProfile(request, tuiter_username):
             )[0]
         timeline_tuits = Tuit.objects.filter(
                 user=tuiter_user
-            )
+            ).order_by('-tuit_date')
         total_tuits = len(Tuit.objects.filter(
                 user=tuiter_user
             ))
@@ -352,9 +385,20 @@ def userProfile(request, tuiter_username):
         total_followers = len(UserFollowsUser.objects.filter(
                 followed_user=tuiter_user
             ))
-        timeline_tuits = Tuit.objects.filter(
-                user=tuiter_user
-            )
+        user_likes_tuits = UserLikesTuit.objects.filter(user=user)
+        tuits = []
+        for t in timeline_tuits:
+            tuit_data = {
+                'tuit_object': t,
+                'liked': False,
+                'retuits': 0
+            }
+            for ult in user_likes_tuits:
+                if t == ult.tuit:
+                    tuit_data['liked'] = True
+                    break
+            tuits.append(tuit_data)
+        redirect_url = 'tuiter:userProfile'
         ctxt = {
             'user': tuiter_user,
             'following_user': following_user,
@@ -363,7 +407,11 @@ def userProfile(request, tuiter_username):
             'total_tuits': total_tuits,
             'total_following': total_following,
             'total_followers': total_followers,
-            'timeline_tuits': timeline_tuits
+            'timeline_tuits': tuits,
+            'logged_user': user,
+            'redirect_url': redirect_url,
+            'use_parameters': True,
+            'parameter_value': tuiter_username
         }
         if user == tuiter_user:
             return render_to_response(
@@ -461,9 +509,6 @@ def userProfileFollowing(request, tuiter_username):
         user_settings = UserSettings.objects.filter(
                 user=tuiter_user
             )[0]
-        timeline_tuits = Tuit.objects.filter(
-                user=tuiter_user
-            )
         total_tuits = len(Tuit.objects.filter(
                 user=tuiter_user
             ))
@@ -490,7 +535,8 @@ def userProfileFollowing(request, tuiter_username):
             'total_tuits': total_tuits,
             'total_following': total_following,
             'total_followers': total_followers,
-            'users': following_users
+            'users': following_users,
+            'logged_user': user
         }
         return render_to_response(
                 'tuits/user_follows.html',
@@ -519,9 +565,6 @@ def userProfileFollowers(request, tuiter_username):
         user_settings = UserSettings.objects.filter(
                 user=tuiter_user
             )[0]
-        timeline_tuits = Tuit.objects.filter(
-                user=tuiter_user
-            )
         total_tuits = len(Tuit.objects.filter(
                 user=tuiter_user
             ))
@@ -548,10 +591,124 @@ def userProfileFollowers(request, tuiter_username):
             'total_tuits': total_tuits,
             'total_following': total_following,
             'total_followers': total_followers,
-            'users': follower_users
+            'users': follower_users,
+            'logged_user': user
         }
         return render_to_response(
                 'tuits/user_followers.html',
                 context=ctxt,
                 context_instance=RequestContext(request)
             )
+
+
+def deleteTuit(request):
+    """Delete tuit function."""
+    if request.POST and request.user.is_authenticated:
+        tuit_id = request.POST['tuit_id']
+        redirect_url = request.POST['redirect_url']
+        use_parameters = request.POST['use_parameters']
+        user = request.user
+        tuit = Tuit.objects.get(pk=tuit_id)
+        if tuit.user == user:
+            tuit.delete()
+        if use_parameters == 'True':
+            parameter_value = request.POST['parameter_value']
+            return HttpResponseRedirect(
+                    reverse(
+                        redirect_url,
+                        kwargs={
+                            'tuiter_username': parameter_value
+                        }
+                    )
+                )
+        else:
+            return HttpResponseRedirect(
+                    reverse(redirect_url)
+                )
+    else:
+        return render_to_response(
+            'account/landing.html',
+            context_instance=RequestContext(request)
+        )
+
+
+def likeTuit(request):
+    """Like tuit function."""
+    if request.POST and request.user.is_authenticated:
+        tuit_id = request.POST['tuit_id']
+        redirect_url = request.POST['redirect_url']
+        use_parameters = request.POST['use_parameters']
+        user = request.user
+        tuit = Tuit.objects.get(pk=tuit_id)
+        user_likes_tuits = None
+        user_likes_tuits = UserLikesTuit.objects.filter(
+                user=user,
+                tuit=tuit
+            )
+        if not user_likes_tuits:
+            user_likes_tuit = UserLikesTuit()
+            user_likes_tuit.user = user
+            user_likes_tuit.tuit = tuit
+            user_likes_tuit.save()
+            tuit.total_likes = tuit.total_likes+1
+            tuit.save()
+        if use_parameters == 'True':
+            parameter_value = request.POST['parameter_value']
+            return HttpResponseRedirect(
+                    reverse(
+                        redirect_url,
+                        kwargs={
+                            'tuiter_username': parameter_value
+                        }
+                    )
+                )
+        else:
+            return HttpResponseRedirect(
+                    reverse(redirect_url)
+                )
+    else:
+        return render_to_response(
+            'account/landing.html',
+            context_instance=RequestContext(request)
+        )
+
+
+def removeTuitLike(request):
+    """Dislike tuit function."""
+    if request.POST and request.user.is_authenticated:
+        tuit_id = request.POST['tuit_id']
+        redirect_url = request.POST['redirect_url']
+        use_parameters = request.POST['use_parameters']
+        print(use_parameters)
+        user = request.user
+        tuit = Tuit.objects.get(pk=tuit_id)
+        user_likes_tuits = None
+        user_likes_tuits = UserLikesTuit.objects.filter(
+                user=user,
+                tuit=tuit
+            )
+        if user_likes_tuits:
+            user_likes_tuit = user_likes_tuits[0]
+            user_likes_tuit.delete()
+            tuit.total_likes = tuit.total_likes-1
+            tuit.save()
+        if use_parameters == 'True':
+            parameter_value = request.POST['parameter_value']
+            return HttpResponseRedirect(
+                    reverse(
+                        redirect_url,
+                        kwargs={
+                            'tuiter_username': parameter_value
+                        }
+                    )
+                )
+        else:
+            return HttpResponseRedirect(
+                    reverse(redirect_url)
+                )
+    else:
+        print("doing else...")
+        return render_to_response(
+            'account/landing.html',
+            context_instance=RequestContext(request)
+        )
