@@ -81,8 +81,7 @@ def timeline(request):
         for t in timeline_tuits:
             tuit_data = {
                 'tuit_object': t,
-                'liked': False,
-                'retuits': 0
+                'liked': False
             }
             for ult in user_likes_tuits:
                 if t == ult.tuit:
@@ -147,8 +146,7 @@ def my_profile(request):
         for t in timeline_tuits:
             tuit_data = {
                 'tuit_object': t,
-                'liked': False,
-                'retuits': 0
+                'liked': False
             }
             for ult in user_likes_tuits:
                 if t == ult.tuit:
@@ -390,8 +388,7 @@ def userProfile(request, tuiter_username):
         for t in timeline_tuits:
             tuit_data = {
                 'tuit_object': t,
-                'liked': False,
-                'retuits': 0
+                'liked': False
             }
             for ult in user_likes_tuits:
                 if t == ult.tuit:
@@ -679,7 +676,6 @@ def removeTuitLike(request):
         tuit_id = request.POST['tuit_id']
         redirect_url = request.POST['redirect_url']
         use_parameters = request.POST['use_parameters']
-        print(use_parameters)
         user = request.user
         tuit = Tuit.objects.get(pk=tuit_id)
         user_likes_tuits = None
@@ -707,7 +703,47 @@ def removeTuitLike(request):
                     reverse(redirect_url)
                 )
     else:
-        print("doing else...")
+        return render_to_response(
+            'account/landing.html',
+            context_instance=RequestContext(request)
+        )
+
+
+def retuit(request):
+    """Retuit Function."""
+    if request.POST and request.user.is_authenticated:
+        tuit_id = request.POST['tuit_id']
+        redirect_url = request.POST['redirect_url']
+        use_parameters = request.POST['use_parameters']
+        user = request.user
+        tuit = Tuit.objects.get(pk=tuit_id)
+        if tuit.is_retuit:
+            tuit = Tuit.objects.get(pk=tuit.original_tuit.id)
+        newT = Tuit()
+        newT.user = user
+        newT.message = tuit.message
+        newT.is_retuit = True
+        newT.original_tuit = tuit
+        newT.save()
+
+        tuit.total_retuits = tuit.total_retuits+1
+        tuit.save()
+
+        if use_parameters == 'True':
+            parameter_value = request.POST['parameter_value']
+            return HttpResponseRedirect(
+                    reverse(
+                        redirect_url,
+                        kwargs={
+                            'tuiter_username': parameter_value
+                        }
+                    )
+                )
+        else:
+            return HttpResponseRedirect(
+                    reverse(redirect_url)
+                )
+    else:
         return render_to_response(
             'account/landing.html',
             context_instance=RequestContext(request)

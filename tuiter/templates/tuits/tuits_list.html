@@ -3,12 +3,21 @@
         {% for t in timeline_tuits %}
             <li>
                 <ul style="list-style-type:none">
+                    {% if t.tuit_object.is_retuit == True %}
+                    <li><a href="{% url 'tuiter:userProfile' t.tuit_object.user.username %}">{{ t.tuit_object.user.username }}</a> retuited: </li>
+                    <li><a href="{% url 'tuiter:userProfile' t.tuit_object.original_tuit.user.username %}">@{{ t.tuit_object.original_tuit.user.username }}</a> {{ t.tuit_object.tuit_date | date:"g:i  d M, Y" }} </li>
+                    {% else %}
                     <li><a href="{% url 'tuiter:userProfile' t.tuit_object.user.username %}">@{{ t.tuit_object.user.username }}</a> {{ t.tuit_object.tuit_date | date:"g:i  d M, Y" }} </li>
+                    {% endif %}
                     <li>{{ t.tuit_object.message }}</li>
                     <table>
                         <tr>
                             <td>likes {{ t.tuit_object.total_likes }}</td>
-                            <td>retuits {{ t.retuits }}</td>
+                            {% if t.tuit_object.is_retuit == True %}
+                            <td>retuits {{ t.tuit_object.original_tuit.total_retuits }}</td>
+                            {% else %}
+                            <td>retuits {{ t.tuit_object.total_retuits }}</td>
+                            {% endif %}
                         </tr>
                     </table>
                     <li>
@@ -36,8 +45,12 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <form action="#" method="POST">
+                                <form action="{% url 'tuiter:retuit' %}" method="POST">
                                     {% csrf_token %}
+                                    <input type="hidden" name="tuit_id" value="{{ t.tuit_object.id }}">
+                                    <input type="hidden" name="redirect_url" value="{{ redirect_url }}">
+                                    <input type="hidden" name="use_parameters" value="{{ use_parameters }}">
+                                    <input type="hidden" name="parameter_value" value="{{ parameter_value }}">
                                     <input type="submit" value="Retuit">
                                 </form>
                             </td>
