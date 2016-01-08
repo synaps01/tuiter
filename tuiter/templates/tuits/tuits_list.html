@@ -10,6 +10,13 @@
                     <li><a href="{% url 'tuiter:userProfile' t.tuit_object.user.username %}">@{{ t.tuit_object.user.username }}</a> {{ t.tuit_object.tuit_date | date:"g:i  d M, Y" }} </li>
                     {% endif %}
                     <li>{{ t.tuit_object.message }}</li>
+                    {% if t.tuit_object.picture %}
+                    <li>
+                        <figure>
+                            <img src="{{ t.tuit_object.picture.url }}" alt="tuit_picture" height="150" width="150">
+                        </figure>
+                    </li>
+                    {% endif %}
                     <table>
                         <tr>
                             <td>likes {{ t.tuit_object.total_likes }}</td>

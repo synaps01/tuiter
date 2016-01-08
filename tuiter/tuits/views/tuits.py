@@ -111,13 +111,20 @@ def timeline(request):
 def newtuit(request):
     """newtuit funciton."""
     tuit_text = ''
+    tuit_picture = None
     if request.POST:
         tuit_text = request.POST['tuit_text']
+        try:
+            tuit_picture = request.FILES['fileToUpload']
+        except:
+            tuit_picture = None
     if tuit_text and len(tuit_text) > 0 and request.user.is_authenticated():
         user = request.user
         newT = Tuit()
         newT.user = user
         newT.message = tuit_text
+        if tuit_picture:
+            newT.picture = tuit_picture
         newT.save()
     return HttpResponseRedirect(reverse('tuiter:timeline'))
 
@@ -737,6 +744,7 @@ def retuit(request):
         newT.user = user
         newT.message = tuit.message
         newT.is_retuit = True
+        newT.picture = tuit.picture
         newT.original_tuit = tuit
         newT.save()
 
