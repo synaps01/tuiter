@@ -24,9 +24,12 @@ import ast
 
 def landingPageView(request):
     """function for landing view."""
-    return render_to_response(
-        'account/landing.html',
-        context_instance=RequestContext(request)
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('tuiter:timeline'))
+    else:
+        return render_to_response(
+            'account/landing.html',
+            context_instance=RequestContext(request)
         )
 
 
