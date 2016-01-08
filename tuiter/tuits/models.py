@@ -11,16 +11,28 @@ from django.contrib.auth.models import User
 class Tuit(models.Model):
     """Model for tuit."""
 
+    def tuit_file_name(instance, filename):
+        """Rename tuit file function."""
+        ext = filename.split('.')[-1]
+        file_path = 'media/tuits/images/' + instance.user.username + '_' + str(instance.id) + '.' + ext  # NOQA
+        return file_path
+
+    def video_file_name(instance, filename):
+        """Rename tuit file function."""
+        ext = filename.split('.')[-1]
+        file_path = 'media/tuits/videos/' + instance.user.username + '_' + str(instance.id) + '.' + ext  # NOQA
+        return file_path
+
     user = models.ForeignKey(User)
     message = models.TextField(blank=False, null=False)
     tuit_date = models.DateTimeField(auto_now_add=True)
     picture = models.ImageField(
-        upload_to='media/tuits/images',
+        upload_to=tuit_file_name,
         blank=True,
         null=True
     )
     video_file = models.FileField(
-        upload_to='media/tuits/videos', max_length=200, blank=True, null=True
+        upload_to=video_file_name, max_length=200, blank=True, null=True
     )
     total_likes = models.IntegerField(default=0)
     total_retuits = models.IntegerField(default=0)

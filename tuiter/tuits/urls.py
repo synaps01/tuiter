@@ -45,4 +45,14 @@ urlpatterns = [
         tuits.userProfileFollowers,
         name='userProfileFollowers'
         ),
+    url(
+        r'upload_profile_image$',
+        tuits.uploadProfileImage,
+        name='uploadProfileImage'
+        ),
+    url(
+        r'upload_cover_image$',
+        tuits.uploadCoverImage,
+        name='uploadCoverImage'
+        ),
 ]

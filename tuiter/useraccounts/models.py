@@ -10,14 +10,26 @@ from django.db import models
 class UserSettings(models.Model):
     """Model for user settings."""
 
+    def profile_file_name(instance, filename):
+        """Rename file function."""
+        ext = filename.split('.')[-1]
+        file_path = 'media/users/profile_pictures/' + 'profile_' + instance.user.username + '.' + ext  # NOQA
+        return file_path
+
+    def cover_file_name(instance, filename):
+        """Rename file function."""
+        ext = filename.split('.')[-1]
+        file_path = 'media/users/profile_pictures/' + 'cover_' + instance.user.username + '.' + ext  # NOQA
+        return file_path
+
     user = models.OneToOneField(User)
     profile_picture = models.ImageField(
-        upload_to='media/users/profile_pictures',
+        upload_to=profile_file_name,
         blank=True,
         null=True
     )
     cover_picture = models.ImageField(
-        upload_to='media/users/profile_pictures',
+        upload_to=cover_file_name,
         blank=True,
         null=True
     )
