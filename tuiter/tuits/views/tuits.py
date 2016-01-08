@@ -249,8 +249,12 @@ def editBasicInfo(request):
             user.last_name = new_last_name
             user.email = new_email
             user.save()
+            user_settings = UserSettings.objects.get(user=user)
             ctxt = {
-                'userUpdated': 'yes'
+                'userUpdated': 'yes',
+                'user': user,
+                'user_settings': user_settings
+
             }
             return render_to_response(
                     'tuits/edit_profile.html',
@@ -278,8 +282,12 @@ def changePassword(request):
         confirm_password = request.POST['confirm_password']
         if new_password != confirm_password:
             pass_message = 'The new password doesn\'t match'
+            user = request.user
+            user_settings = UserSettings.objects.get(user=user)
             ctxt = {
-                'pass_message': pass_message
+                'pass_message': pass_message,
+                'user': user,
+                'user_settings': user_settings
             }
             return render_to_response(
                     'tuits/edit_profile.html',
@@ -291,9 +299,12 @@ def changePassword(request):
             username = request.user.username
             user_auth = authenticate(username=username, password=old_password)
             if user_auth is None:
-                pass_message = 'The old password is incorrect'
+                pass_message = 'The old password is not correct'
+                user_settings = UserSettings.objects.get(user=user)
                 ctxt = {
-                    'pass_message': pass_message
+                    'pass_message': pass_message,
+                    'user': user,
+                    'user_settings': user_settings
                 }
                 return render_to_response(
                         'tuits/edit_profile.html',
@@ -311,8 +322,11 @@ def changePassword(request):
                     if new_user_session.is_active:
                         login(request, new_user_session)
                 pass_message = 'Password updated successfully!'
+                user_settings = UserSettings.objects.get(user=new_user_session)
                 ctxt = {
-                    'pass_message': pass_message
+                    'pass_message': pass_message,
+                    'user': new_user_session,
+                    'user_settings': user_settings
                 }
                 return render_to_response(
                         'tuits/edit_profile.html',
@@ -743,6 +757,84 @@ def retuit(request):
             return HttpResponseRedirect(
                     reverse(redirect_url)
                 )
+    else:
+        return render_to_response(
+            'account/landing.html',
+            context_instance=RequestContext(request)
+        )
+
+
+def uploadProfileImage(request):
+    """Upload profile Function."""
+    if request.POST and request.user.is_authenticated:
+        user = request.user
+        user_settings = UserSettings.objects.get(user=user)
+        try:
+            profile_picture = request.FILES['fileToUpload']
+            user_settings.profile_picture = profile_picture
+            user_settings.save()
+            profileImageMessage = 'Image upload successful!'
+            ctxt = {
+                'profileImageMessage': profileImageMessage,
+                'user': user,
+                'user_settings': user_settings
+            }
+            return render_to_response(
+                'tuits/edit_profile.html',
+                context=ctxt,
+                context_instance=RequestContext(request)
+            )
+        except:
+            profileImageMessage = 'Error with image upload!'
+            ctxt = {
+                'profileImageMessage': profileImageMessage,
+                'user': user,
+                'user_settings': user_settings
+            }
+            return render_to_response(
+                'tuits/edit_profile.html',
+                context=ctxt,
+                context_instance=RequestContext(request)
+            )
+    else:
+        return render_to_response(
+            'account/landing.html',
+            context_instance=RequestContext(request)
+        )
+
+
+def uploadCoverImage(request):
+    """Upload profile Function."""
+    if request.POST and request.user.is_authenticated:
+        user = request.user
+        user_settings = UserSettings.objects.get(user=user)
+        try:
+            cover_picture = request.FILES['fileToUpload']
+            user_settings.cover_picture = cover_picture
+            user_settings.save()
+            coverImageMessage = 'Image upload successful!'
+            ctxt = {
+                'coverImageMessage': coverImageMessage,
+                'user': user,
+                'user_settings': user_settings
+            }
+            return render_to_response(
+                'tuits/edit_profile.html',
+                context=ctxt,
+                context_instance=RequestContext(request)
+            )
+        except:
+            coverImageMessage = 'Error with image upload!'
+            ctxt = {
+                'coverImageMessage': coverImageMessage,
+                'user': user,
+                'user_settings': user_settings
+            }
+            return render_to_response(
+                'tuits/edit_profile.html',
+                context=ctxt,
+                context_instance=RequestContext(request)
+            )
     else:
         return render_to_response(
             'account/landing.html',
