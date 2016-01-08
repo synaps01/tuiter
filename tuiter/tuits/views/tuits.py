@@ -11,7 +11,11 @@ from django.views.generic import (
 )
 
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import (
+    HttpResponseRedirect,
+    HttpResponse,
+    HttpResponseNotFound
+    )
 from django.template import RequestContext, loader
 from django.core.urlresolvers import reverse
 
@@ -364,7 +368,7 @@ def searchUser(request):
                 Q(username__icontains=search_text) |
                 Q(first_name__icontains=search_text) |
                 Q(last_name__icontains=search_text)
-            )
+            ).exclude(username='admin')
         ctxt = {
                 'users': users
             }
@@ -380,8 +384,9 @@ def userProfile(request, tuiter_username):
     user = following_user = None
     user = request.user
     tuiter_users = tuiter_user = None
-    tuiter_users = User.objects.filter(
-        username=tuiter_username
+    if tuiter_username.lower() != 'admin':
+        tuiter_users = User.objects.filter(
+            username=tuiter_username
         )
     if tuiter_users:
         tuiter_user = tuiter_users[0]
@@ -446,6 +451,8 @@ def userProfile(request, tuiter_username):
                     context=ctxt,
                     context_instance=RequestContext(request)
                 )
+    else:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
 def userFollow(request, tuiter_user):
