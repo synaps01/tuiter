@@ -41,6 +41,7 @@ def tuiter_login(request):
     """login function."""
     logout(request)
     username = password = ''
+    ctxt = None
     if request.POST:
         username = request.POST['username']
         password = request.POST['password']
@@ -50,9 +51,13 @@ def tuiter_login(request):
             if user.is_active:
                 login(request, user)
                 return HttpResponseRedirect(reverse('tuiter:timeline'))
-    dictionary = {'message': "Wrong username or password"}
+        else:
+            ctxt = {
+                'loginMessage': 'Wrong username or password'
+            }
     return render_to_response(
             'account/landing.html',
+            context=ctxt,
             context_instance=RequestContext(request)
         )
 
@@ -101,7 +106,8 @@ def timeline(request):
             'username': username,
             'logged_user': user,
             'redirect_url': redirect_url,
-            'use_parameters': False
+            'use_parameters': False,
+            'public_access': False
         }
         return render_to_response(
                 'tuits/timeline.html',
@@ -138,6 +144,7 @@ def newtuit(request):
 
 def my_profile(request):
     """my_profile funciton."""
+    public_access = False
     if request.user.is_authenticated():
         user = request.user
         user_settings = UserSettings.objects.filter(
@@ -178,7 +185,8 @@ def my_profile(request):
             'logged_user': user,
             'redirect_url': redirect_url,
             'use_parameters': True,
-            'parameter_value': user.username
+            'parameter_value': user.username,
+            'parameter_name': 'tuiter_user'
         }
         return render_to_response(
             'tuits/my_profile.html',
@@ -217,18 +225,40 @@ def edit_profile(request):
 
 def register(request):
     """Register function."""
-    user = username = email = password = None
+    ctxt = user = username = email = password = None
     if request.POST:
         username = request.POST['username']
         password = request.POST['password']
+        confirm_password = request.POST['confirm_password']
         email = request.POST['email']
         users = User.objects.filter(
                 username=username
             )
         if users:
-            dictionary = {'message': "Username already exists."}
+            ctxt = {
+                'registerMessage': "Username already exists."
+            }
             return render_to_response(
                 'account/landing.html',
+                context=ctxt,
+                context_instance=RequestContext(request)
+            )
+        elif password != confirm_password:
+            ctxt = {
+                'registerMessage': "The password doesn't match."
+            }
+            return render_to_response(
+                'account/landing.html',
+                context=ctxt,
+                context_instance=RequestContext(request)
+            )
+        elif len(password) == 0:
+            ctxt = {
+                'registerMessage': "The password is empty."
+            }
+            return render_to_response(
+                'account/landing.html',
+                context=ctxt,
                 context_instance=RequestContext(request)
             )
         else:
@@ -384,6 +414,9 @@ def userProfile(request, tuiter_username):
     user = following_user = None
     user = request.user
     tuiter_users = tuiter_user = None
+    public_access = False
+    if request.user.is_anonymous():
+            public_access = True
     if tuiter_username.lower() != 'admin':
         tuiter_users = User.objects.filter(
             username=tuiter_username
@@ -391,12 +424,13 @@ def userProfile(request, tuiter_username):
     if tuiter_users:
         tuiter_user = tuiter_users[0]
         if user:
-            ufus = UserFollowsUser.objects.filter(
-                    user=user,
-                    followed_user=tuiter_user
-                )
-            if ufus:
-                following_user = 'yes'
+            if not user.is_anonymous():
+                ufus = UserFollowsUser.objects.filter(
+                        user=user,
+                        followed_user=tuiter_user
+                    )
+                if ufus:
+                    following_user = 'yes'
         user_settings = UserSettings.objects.filter(
                 user=tuiter_user
             )[0]
@@ -412,17 +446,20 @@ def userProfile(request, tuiter_username):
         total_followers = len(UserFollowsUser.objects.filter(
                 followed_user=tuiter_user
             ))
-        user_likes_tuits = UserLikesTuit.objects.filter(user=user)
         tuits = []
+        user_likes_tuits = None
+        if not user.is_anonymous():
+            user_likes_tuits = UserLikesTuit.objects.filter(user=user)
         for t in timeline_tuits:
             tuit_data = {
                 'tuit_object': t,
                 'liked': False
             }
-            for ult in user_likes_tuits:
-                if t == ult.tuit:
-                    tuit_data['liked'] = True
-                    break
+            if not user.is_anonymous():
+                for ult in user_likes_tuits:
+                    if t == ult.tuit:
+                        tuit_data['liked'] = True
+                        break
             tuits.append(tuit_data)
         redirect_url = 'tuiter:userProfile'
         ctxt = {
@@ -437,9 +474,11 @@ def userProfile(request, tuiter_username):
             'logged_user': user,
             'redirect_url': redirect_url,
             'use_parameters': True,
-            'parameter_value': tuiter_username
+            'parameter_value': tuiter_username,
+            'parameter_name': 'tuiter_username',
+            'public_access': public_access
         }
-        if user == tuiter_user:
+        if user == tuiter_user and not user.is_anonymous():
             return render_to_response(
                     'tuits/my_profile.html',
                     context=ctxt,
@@ -527,7 +566,7 @@ def userProfileFollowing(request, tuiter_username):
         )
     if tuiter_users:
         tuiter_user = tuiter_users[0]
-        if user:
+        if user and not user.is_anonymous():
             ufus = UserFollowsUser.objects.filter(
                     user=user,
                     followed_user=tuiter_user
@@ -583,7 +622,7 @@ def userProfileFollowers(request, tuiter_username):
         )
     if tuiter_users:
         tuiter_user = tuiter_users[0]
-        if user:
+        if user and not user.is_anonymous():
             ufus = UserFollowsUser.objects.filter(
                     user=user,
                     followed_user=tuiter_user
@@ -641,11 +680,12 @@ def deleteTuit(request):
             tuit.delete()
         if use_parameters == 'True':
             parameter_value = request.POST['parameter_value']
+            parameter_name = request.POST['parameter_name']
             return HttpResponseRedirect(
                     reverse(
                         redirect_url,
                         kwargs={
-                            'tuiter_username': parameter_value
+                            parameter_name: parameter_value
                         }
                     )
                 )
@@ -682,11 +722,12 @@ def likeTuit(request):
             tuit.save()
         if use_parameters == 'True':
             parameter_value = request.POST['parameter_value']
+            parameter_name = request.POST['parameter_name']
             return HttpResponseRedirect(
                     reverse(
                         redirect_url,
                         kwargs={
-                            'tuiter_username': parameter_value
+                            parameter_name: parameter_value
                         }
                     )
                 )
@@ -721,11 +762,12 @@ def removeTuitLike(request):
             tuit.save()
         if use_parameters == 'True':
             parameter_value = request.POST['parameter_value']
+            parameter_name = request.POST['parameter_name']
             return HttpResponseRedirect(
                     reverse(
                         redirect_url,
                         kwargs={
-                            'tuiter_username': parameter_value
+                            parameter_name: parameter_value
                         }
                     )
                 )
@@ -762,12 +804,13 @@ def retuit(request):
         tuit.save()
 
         if use_parameters == 'True':
+            parameter_name = request.POST['parameter_name']
             parameter_value = request.POST['parameter_value']
             return HttpResponseRedirect(
                     reverse(
                         redirect_url,
                         kwargs={
-                            'tuiter_username': parameter_value
+                            parameter_name: parameter_value
                         }
                     )
                 )
@@ -856,5 +899,36 @@ def uploadCoverImage(request):
     else:
         return render_to_response(
             'account/landing.html',
+            context_instance=RequestContext(request)
+        )
+
+
+def tuitDetail(request, tuit_id):
+    """Tuit detail function."""
+    tuit = Tuit.objects.get(id=tuit_id)
+    public_access = False
+    tuit_liked = False
+    if request.user.is_anonymous():
+        public_access = True
+    else:
+        userLikesTuit = UserLikesTuit.objects.filter(
+            user=request.user,
+            tuit=tuit
+            )
+        if userLikesTuit:
+            tuit_liked = True
+    redirect_url = 'tuiter:tuitDetail'
+    ctxt = {
+        'tuit_object': tuit,
+        'public_access': public_access,
+        'redirect_url': redirect_url,
+        'use_parameters': True,
+        'parameter_value': tuit.id,
+        'parameter_name': 'tuit_id',
+        'tuit_liked': tuit_liked
+    }
+    return render_to_response(
+            'tuits/tuit_detail.html',
+            context=ctxt,
             context_instance=RequestContext(request)
         )

@@ -1,5 +1,9 @@
-<ul tyle="list-style-type:none">
+<ul style="list-style-type:none">
+    {% if not user.is_anonymous %}
     <li><a href="{% url 'tuiter:timeline' %}">Timeline</a></li>
     <li><a href="{% url 'tuiter:my_profile' %}">Profile</a></li>
     <li><a href="{% url 'tuiter:logout' %}">Logout</a></li>
+    {% else %}
+    <li><a href="{% url 'tuiter:landing' %}">Tuiter</a></li>
+    {% endif %}
 </ul>

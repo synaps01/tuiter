@@ -9,7 +9,7 @@
                     {% else %}
                     <li><a href="{% url 'tuiter:userProfile' t.tuit_object.user.username %}">@{{ t.tuit_object.user.username }}</a> {{ t.tuit_object.tuit_date | date:"g:i  d M, Y" }} </li>
                     {% endif %}
-                    <li>{{ t.tuit_object.message }}</li>
+                    <li><a href="{% url 'tuiter:tuitDetail' t.tuit_object.id %}" style="text-decoration: none; color : #000000;">{{ t.tuit_object.message }}</a></li>
                     {% if t.tuit_object.picture %}
                     <li>
                         <figure>
@@ -28,6 +28,7 @@
                         </tr>
                     </table>
                     <li>
+                    {% if public_access == False %}
                     <table>
                         <tr>
                             <td>
@@ -37,6 +38,7 @@
                                     <input type="hidden" name="tuit_id" value="{{ t.tuit_object.id }}">
                                     <input type="hidden" name="redirect_url" value="{{ redirect_url }}">
                                     <input type="hidden" name="use_parameters" value="{{ use_parameters }}">
+                                    <input type="hidden" name="parameter_name" value="{{ parameter_name }}">
                                     <input type="hidden" name="parameter_value" value="{{ parameter_value }}">
                                     <input id="{{ t.tuit_object.id }}" type="submit" value="Dislike">
                                 </form>
@@ -46,6 +48,7 @@
                                     <input type="hidden" name="tuit_id" value="{{ t.tuit_object.id }}">
                                     <input type="hidden" name="redirect_url" value="{{ redirect_url }}">
                                     <input type="hidden" name="use_parameters" value="{{ use_parameters }}">
+                                    <input type="hidden" name="parameter_name" value="{{ parameter_name }}">
                                     <input type="hidden" name="parameter_value" value="{{ parameter_value }}">
                                     <input id="{{ t.tuit_object.id }}" type="submit" value="Like">
                                 </form>
@@ -57,6 +60,7 @@
                                     <input type="hidden" name="tuit_id" value="{{ t.tuit_object.id }}">
                                     <input type="hidden" name="redirect_url" value="{{ redirect_url }}">
                                     <input type="hidden" name="use_parameters" value="{{ use_parameters }}">
+                                    <input type="hidden" name="parameter_name" value="{{ parameter_name }}">
                                     <input type="hidden" name="parameter_value" value="{{ parameter_value }}">
                                     <input type="submit" value="Retuit">
                                 </form>
@@ -68,6 +72,7 @@
                                     <input type="hidden" name="tuit_id" value="{{ t.tuit_object.id }}">
                                     <input type="hidden" name="redirect_url" value="{{ redirect_url }}">
                                     <input type="hidden" name="use_parameters" value="{{ use_parameters }}">
+                                    <input type="hidden" name="parameter_name" value="{{ parameter_name }}">
                                     <input type="hidden" name="parameter_value" value="{{ parameter_value }}">
                                     <input type="submit" value="Delete">
                                 </form>
@@ -75,6 +80,7 @@
                             {% endif %}
                         </tr>
                     </table>
+                    {% endif %}
                     </li>
                     <li>&nbsp;</li>
                 </ul>

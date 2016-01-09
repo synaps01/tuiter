@@ -55,4 +55,9 @@ urlpatterns = [
         tuits.uploadCoverImage,
         name='uploadCoverImage'
         ),
+    url(
+        r'tuit_detail/(?P<tuit_id>[\d-]+)',
+        tuits.tuitDetail,
+        name='tuitDetail'
+        ),
 ]
