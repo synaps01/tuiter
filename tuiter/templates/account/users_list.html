@@ -1,0 +1,16 @@
+<article>
+    <ul style="list-style-type:none">
+        {% for u in users %}
+            <li>
+                <ul style="list-style-type:none">
+                    <li><a href="{% url 'tuiter:userProfile' u.username %}">@{{ u.username }}</a></li>
+                    <li>{{ u.first_name }} {{ u.last_name }}</li>
+                    <li>tuiter user since {{ u.date_joined | date:"g:i  d M, Y" }} </li>
+                    <li>&nbsp;</li>
+                </ul>
+            </li>
+        {% empty %}
+            <p>Not found</p>
+        {% endfor %}
+    </ul>
+</article>

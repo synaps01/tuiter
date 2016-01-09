@@ -1,0 +1,8 @@
+{% extends "tuits/tuiter_base.html" %}
+{% block title %}Timeline{% endblock %}
+{% block body %}
+    <h3> Timeline de {{ username }} </h3>
+    {% include "tuits/new_tuit.html" %}
+    {% include "account/user_search.html" %}
+    {% include "tuits/tuits_list.html" %}
+{% endblock %}

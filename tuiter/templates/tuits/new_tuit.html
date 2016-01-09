@@ -1,0 +1,9 @@
+<aside>
+    <form action="{% url 'tuiter:newtuit' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <ul style="list-style-type:none">
+            <li><textarea name="tuit_text" rows="3" cols="50"></textarea></li>
+            <li><input type="file" name="fileToUpload" id="fileToUpload" name="Add Image"><input type="submit" value="Tuit"></li>
+        </ul>
+    </form>
+</aside>

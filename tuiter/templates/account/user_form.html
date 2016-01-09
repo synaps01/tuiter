@@ -1,0 +1,53 @@
+<article>
+     <h3>Edit your profile:</h3>
+     {% if userUpdated %}<br><h3>Update successful!</h3><br>{% endif %}
+     <form action="{% url 'tuiter:editBasicInfo' %}" method="POST">
+         {% csrf_token %}
+         <ul style="list-style-type:none">
+             <li>Username: {{ user.username }}</li>
+            <li>First name: <input type="text" name="first_name" value="{{ user.first_name }}"/></li>
+            <li>Last name: <input type="text" name="last_name" value="{{ user.last_name }}"/></li>
+             <li>Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" name="email" value="{{ user.email }}"/></li>
+             <li>
+                <a href="{% url 'tuiter:my_profile' %}"><input type="button" value="Cancel"/></a>
+                <input type="submit" value="Save">
+            </li>
+        </ul>
+    </form>
+    {% if profileImageMessage %}<br><h3>{{ profileImageMessage }}</h3><br>{% endif %}
+    <figure>
+        <img src="{% if user_settings.profile_picture %}{{ user_settings.profile_picture.url }} {% endif %}" alt="profile_picture" height="80" width="80">
+    </figure>
+    <form action="{% url 'tuiter:uploadProfileImage' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <ul style="list-style-type:none">
+            <li>Select profile image to upload:<br>
+            <input type="file" name="fileToUpload" id="fileToUpload"></li>
+            <li><input type="submit" value="Upload Image" name="submit"></li>
+        </ul>
+    </form>
+    {% if coverImageMessage %}<br><h3>{{ coverImageMessage }}</h3><br>{% endif %}
+    <figure>
+        <img src="{% if user_settings.cover_picture %} {{ user_settings.cover_picture.url }} {% endif %}" alt="cover_picture" height="80" width="220"> 
+    </figure>
+    <form action="{% url 'tuiter:uploadCoverImage' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <ul style="list-style-type:none">
+            <li>Select cover image to upload:<br>
+            <input type="file" name="fileToUpload" id="fileToUpload"></li>
+            <li><input type="submit" value="Upload Image" name="submit"></li>
+        </ul>
+    </form>
+    {% if pass_message %}<br><h3>{{ pass_message }}</h3><br>{% endif %}
+    <form action="{% url 'tuiter:changePassword' %}" method="POST">
+         {% csrf_token %}
+         <ul style="list-style-type:none">
+            <li>Old Password:&nbsp; <input type="password" name="old_password" /></li>
+            <li>New Password:&nbsp; <input type="password" name="new_password" /></li>
+            <li>Confirm Password:&nbsp; <input type="password" name="confirm_password" /></li>
+            <a href="{% url 'tuiter:my_profile' %}"><input type="button" value="Cancel"/></a>
+                <input type="submit" value="Save">
+            </li>
+         </ul>
+     </form>
+</article>
