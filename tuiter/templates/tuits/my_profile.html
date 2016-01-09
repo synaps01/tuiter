@@ -3,9 +3,9 @@
 {% block body %}
     {% include "tuits/user_card.html" %}
     <article>  
-        <form action="{% url 'tuiter:edit_profile' %}">
+        <form action="{% url 'tuiter:edit_profile' %}" method="POST">
             {% csrf_token %}
-                <input type="submit" value="Edit Profile">
+            <input type="submit" value="Edit Profile">
         </form>
     </article>
     {% include "tuits/tuits_list.html" %}

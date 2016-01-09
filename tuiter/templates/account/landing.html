@@ -13,8 +13,8 @@
         Tuiter
     </h1>
     <article>
-        {% if message %}
-            <p id="letrero">¡{{ message }} hola!</p>
+        {% if loginMessage %}
+            <h3>{{ loginMessage }}</h3>
         {% endif %}
         <h3>Login</h3> 
         <form action="{% url 'tuiter:login' %}" method="POST">
@@ -28,12 +28,16 @@
     </article>
     <article>
         <h3>New User? Register on Tuiter</h3> 
+                {% if registerMessage %}
+        <h3>{{ registerMessage }}</h3>
+        {% endif %}
         <form action="{% url 'tuiter:register' %}" method="POST">
             {% csrf_token %}
             <ul style="list-style-type:none">
                 <li>Username: <input type="text" name="username" /></li>
                 <li>Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" name="email" /></li>
                 <li>Password:&nbsp; <input type="password" name="password" /></li>
+                <li>Confirm:&nbsp; <input type="password" name="confirm_password" /></li>
                 <li><input type="submit" value="Register on Tuiter"></li>
             </ul>
         </form>
