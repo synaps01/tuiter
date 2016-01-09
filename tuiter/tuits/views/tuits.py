@@ -174,7 +174,9 @@ def my_profile(request):
                     tuit_data['liked'] = True
                     break
             tuits.append(tuit_data)
-        redirect_url = 'tuiter:userProfile'
+        redirect_url = 'tuiter:my_profile'
+        if user.is_anonymous():
+            public_access = True
         ctxt = {
             'timeline_tuits': tuits,
             'user': user,
@@ -184,12 +186,11 @@ def my_profile(request):
             'total_followers': total_followers,
             'logged_user': user,
             'redirect_url': redirect_url,
-            'use_parameters': True,
-            'parameter_value': user.username,
-            'parameter_name': 'tuiter_user'
+            'use_parameters': False,
+            'public_access': public_access
         }
         return render_to_response(
-            'tuits/my_profile.html',
+            'account/my_profile.html',
             context=ctxt,
             context_instance=RequestContext(request)
             )
@@ -212,7 +213,7 @@ def edit_profile(request):
             'user_settings': user_settings
         }
         return render_to_response(
-            'tuits/edit_profile.html',
+            'account/edit_profile.html',
             context=ctxt,
             context_instance=RequestContext(request)
             )
@@ -301,7 +302,7 @@ def editBasicInfo(request):
 
             }
             return render_to_response(
-                    'tuits/edit_profile.html',
+                    'account/edit_profile.html',
                     context=ctxt,
                     context_instance=RequestContext(request)
                 )
@@ -312,7 +313,7 @@ def editBasicInfo(request):
                 )
     else:
         return render_to_response(
-                'tuits/edit_profile.html',
+                'account/edit_profile.html',
                 context_instance=RequestContext(request)
             )
 
@@ -334,7 +335,7 @@ def changePassword(request):
                 'user_settings': user_settings
             }
             return render_to_response(
-                    'tuits/edit_profile.html',
+                    'account/edit_profile.html',
                     context=ctxt,
                     context_instance=RequestContext(request)
                 )
@@ -351,7 +352,7 @@ def changePassword(request):
                     'user_settings': user_settings
                 }
                 return render_to_response(
-                        'tuits/edit_profile.html',
+                        'account/edit_profile.html',
                         context=ctxt,
                         context_instance=RequestContext(request)
                     )
@@ -373,7 +374,7 @@ def changePassword(request):
                     'user_settings': user_settings
                 }
                 return render_to_response(
-                        'tuits/edit_profile.html',
+                        'account/edit_profile.html',
                         context=ctxt,
                         context_instance=RequestContext(request)
                     )
@@ -384,7 +385,7 @@ def changePassword(request):
             )
     else:
         return render_to_response(
-                'tuits/edit_profile.html',
+                'account/edit_profile.html',
                 context_instance=RequestContext(request)
             )
 
@@ -403,7 +404,7 @@ def searchUser(request):
                 'users': users
             }
     return render_to_response(
-            'tuits/search_result.html',
+            'account/search_result.html',
             context=ctxt,
             context_instance=RequestContext(request)
         )
@@ -480,13 +481,13 @@ def userProfile(request, tuiter_username):
         }
         if user == tuiter_user and not user.is_anonymous():
             return render_to_response(
-                    'tuits/my_profile.html',
+                    'account/my_profile.html',
                     context=ctxt,
                     context_instance=RequestContext(request)
                 )
         else:
             return render_to_response(
-                    'tuits/user_profile.html',
+                    'account/user_profile.html',
                     context=ctxt,
                     context_instance=RequestContext(request)
                 )
@@ -606,7 +607,7 @@ def userProfileFollowing(request, tuiter_username):
             'logged_user': user
         }
         return render_to_response(
-                'tuits/user_follows.html',
+                'account/user_follows.html',
                 context=ctxt,
                 context_instance=RequestContext(request)
             )
@@ -662,7 +663,7 @@ def userProfileFollowers(request, tuiter_username):
             'logged_user': user
         }
         return render_to_response(
-                'tuits/user_followers.html',
+                'account/user_followers.html',
                 context=ctxt,
                 context_instance=RequestContext(request)
             )
@@ -841,7 +842,7 @@ def uploadProfileImage(request):
                 'user_settings': user_settings
             }
             return render_to_response(
-                'tuits/edit_profile.html',
+                'account/edit_profile.html',
                 context=ctxt,
                 context_instance=RequestContext(request)
             )
@@ -853,7 +854,7 @@ def uploadProfileImage(request):
                 'user_settings': user_settings
             }
             return render_to_response(
-                'tuits/edit_profile.html',
+                'account/edit_profile.html',
                 context=ctxt,
                 context_instance=RequestContext(request)
             )
@@ -880,7 +881,7 @@ def uploadCoverImage(request):
                 'user_settings': user_settings
             }
             return render_to_response(
-                'tuits/edit_profile.html',
+                'account/edit_profile.html',
                 context=ctxt,
                 context_instance=RequestContext(request)
             )
@@ -892,7 +893,7 @@ def uploadCoverImage(request):
                 'user_settings': user_settings
             }
             return render_to_response(
-                'tuits/edit_profile.html',
+                'account/edit_profile.html',
                 context=ctxt,
                 context_instance=RequestContext(request)
             )

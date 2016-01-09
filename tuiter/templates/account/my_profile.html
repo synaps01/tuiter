@@ -1,7 +1,7 @@
 {% extends "tuits/tuiter_base.html" %}
 {% block title %}My Profile{% endblock %}
 {% block body %}
-    {% include "tuits/user_card.html" %}
+    {% include "account/user_card.html" %}
     <article>  
         <form action="{% url 'tuiter:edit_profile' %}" method="POST">
             {% csrf_token %}
