@@ -412,10 +412,11 @@ def searchUser(request):
 
 def userProfile(request, tuiter_username):
     """User profile function."""
-    user = following_user = None
+    user = None
     user = request.user
     tuiter_users = tuiter_user = None
     public_access = False
+    following_user = False
     if request.user.is_anonymous():
             public_access = True
     if tuiter_username.lower() != 'admin':
@@ -431,7 +432,7 @@ def userProfile(request, tuiter_username):
                         followed_user=tuiter_user
                     )
                 if ufus:
-                    following_user = 'yes'
+                    following_user = True
         user_settings = UserSettings.objects.filter(
                 user=tuiter_user
             )[0]
@@ -559,21 +560,26 @@ def userUnfollow(request, tuiter_user):
 
 def userProfileFollowing(request, tuiter_username):
     """Following users function."""
-    user = following_user = None
+    user = None
     user = request.user
+    public_access = False
+    if user.is_anonymous():
+        public_access = True
     tuiter_users = tuiter_user = None
+    following_user = False
     tuiter_users = User.objects.filter(
         username=tuiter_username
         )
     if tuiter_users:
         tuiter_user = tuiter_users[0]
-        if user and not user.is_anonymous():
-            ufus = UserFollowsUser.objects.filter(
-                    user=user,
-                    followed_user=tuiter_user
-                )
-            if ufus:
-                following_user = 'yes'
+        if user:
+            if not user.is_anonymous():
+                ufus = UserFollowsUser.objects.filter(
+                        user=user,
+                        followed_user=tuiter_user
+                    )
+                if ufus:
+                    following_user = True
         user_settings = UserSettings.objects.filter(
                 user=tuiter_user
             )[0]
@@ -604,7 +610,8 @@ def userProfileFollowing(request, tuiter_username):
             'total_following': total_following,
             'total_followers': total_followers,
             'users': following_users,
-            'logged_user': user
+            'logged_user': user,
+            'public_access': public_access
         }
         return render_to_response(
                 'account/user_follows.html',
@@ -615,21 +622,26 @@ def userProfileFollowing(request, tuiter_username):
 
 def userProfileFollowers(request, tuiter_username):
     """Follower users function."""
-    user = following_user = None
+    user = None
     user = request.user
     tuiter_users = tuiter_user = None
+    following_user = False
+    public_access = False
+    if user.is_anonymous():
+        public_access = True
     tuiter_users = User.objects.filter(
         username=tuiter_username
         )
     if tuiter_users:
         tuiter_user = tuiter_users[0]
-        if user and not user.is_anonymous():
-            ufus = UserFollowsUser.objects.filter(
-                    user=user,
-                    followed_user=tuiter_user
-                )
-            if ufus:
-                following_user = 'yes'
+        if user:
+            if not user.is_anonymous():
+                ufus = UserFollowsUser.objects.filter(
+                        user=user,
+                        followed_user=tuiter_user
+                    )
+                if ufus:
+                    following_user = True
         user_settings = UserSettings.objects.filter(
                 user=tuiter_user
             )[0]
@@ -660,7 +672,8 @@ def userProfileFollowers(request, tuiter_username):
             'total_following': total_following,
             'total_followers': total_followers,
             'users': follower_users,
-            'logged_user': user
+            'logged_user': user,
+            'public_access': public_access
         }
         return render_to_response(
                 'account/user_followers.html',

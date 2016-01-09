@@ -3,8 +3,8 @@
 {% block body %}
     {% include "account/user_card.html" %}
     {% if public_access == False %}
-    <article>  
-        {% if following_user %}
+    <article>
+        {% if following_user == True %}
         <form action="{% url 'tuiter:userUnfollow' user %}" method="POST">
             {% csrf_token %}
                 <input type="submit" value="Unfollow">
