@@ -13,6 +13,4 @@ urlpatterns = [
     url('', include(tuiter_urls, namespace='tuiter'))
 ]
 
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # NOQA
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # NOQA
